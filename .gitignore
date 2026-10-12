@@ -1,0 +1,17 @@
+auth_config.json
+bamba.db
+bamba.db.*
+*.sauvegarde
+*.sauvegarde_internet
+app.py.avant_securite
+__pycache__/
+*.pyc
+.env
+app.py.avant_hebergement
+
+# Sauvegardes locales : ne pas publier
+*.avant_*
+*.avant-*
+*.sauvegarde_*
+*.sauvegarde-*
+*.bak
