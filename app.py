@@ -524,6 +524,11 @@ def section(section):
 def server_error(e):
     return page('Erreur', '<div class="panel"><h2>Une erreur est survenue</h2><p>Vérifiez les données saisies puis réessayez.</p><a class="btn" href="/">Retour au tableau de bord</a></div>'),500
 
+
+# Authentification et séparation des données par société
+from bamba_auth import install_auth
+install_auth(app, globals())
+
 if __name__=='__main__':
     print('\nBAMBA CONTROLOR est prêt : http://127.0.0.1:5000\nArrêt : CTRL+C\n')
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT','5000')), debug=False)
