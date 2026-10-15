@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BAMBA CONTROLOR</title>
+<style>
+:root{color-scheme:dark;--bg:#050b19;--panel:#0b1730;--line:#153b65;--cyan:#00eaff;--blue:#168bff;--text:#e9f7ff;--muted:#8aa9c9}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#102b55 0,#050b19 60%);font:15px Arial,sans-serif;color:var(--text)}
+.layout{display:grid;grid-template-columns:245px 1fr;min-height:100vh}
+aside{padding:24px 16px;background:#071124;border-right:1px solid var(--line)}
+.logo{font-size:25px;font-weight:900;letter-spacing:1px;color:var(--cyan);text-shadow:0 0 15px #00bfff}
+.logo small{display:block;font-size:11px;letter-spacing:4px;color:#b7d9ff;margin-top:8px}
+nav{margin-top:35px;display:grid;gap:10px}
+nav a{padding:13px;border-radius:10px;color:#c4dcf7;text-decoration:none;border:1px solid transparent}
+nav a:first-child,nav a:hover{background:#0b2850;border-color:#087cc2;color:var(--cyan)}
+main{padding:28px;min-width:0}
+header{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap;margin-bottom:25px}
+h1{font-size:26px;margin:0}h2{font-size:17px;margin:0 0 20px}
+.sub{color:var(--muted);margin-top:8px}
+.status{border:1px solid #087d94;color:var(--cyan);padding:9px 12px;border-radius:20px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.panel{background:linear-gradient(145deg,#0d1c37,#081226);border:1px solid var(--line);border-radius:15px;padding:20px;box-shadow:0 0 20px #007bff0b}
+.label{color:var(--muted);font-size:13px}.value{font-size:26px;font-weight:800;margin-top:14px;color:var(--cyan)}
+.note{font-size:12px;color:#8baac8;margin-top:8px}
+.columns{display:grid;grid-template-columns:1.4fr 1fr;gap:15px;margin-top:17px}
+.bars{height:190px;display:flex;align-items:end;gap:12px;padding-top:20px}
+.bar{flex:1;min-width:10px;border-radius:6px 6px 0 0;background:linear-gradient(#00eaff,#0879ff);box-shadow:0 0 12px #00bfff33;position:relative}
+.bar span{position:absolute;bottom:-25px;width:100%;text-align:center;font-size:11px;color:var(--muted)}
+.chartfoot{margin-top:32px;color:var(--muted);font-size:12px}
+.track{height:9px;background:#142945;border-radius:10px;margin:10px 0 17px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,#087bff,#00eaff);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{text-align:left;padding:13px 8px;border-bottom:1px solid #17304e}
+th{color:var(--muted);font-weight:500}
+.empty{color:var(--muted);padding:16px 0;font-size:13px}
+@media(max-width:950px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.columns{grid-template-columns:1fr}.layout{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line)}nav{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:20px}main{padding:17px}}
+@media(max-width:420px){.cards{grid-template-columns:1fr}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+<div class="logo">◉))) BAMBA<small>CONTROLOR</small></div>
+<nav>
+<a href="#accueil">◈ Tableau de bord</a>
+<a href="#statistiques">▥ Statistiques</a>
+<a href="#revenus">◉ Revenus</a>
+<a href="#paiements">⇄ Paiements</a>
+<a href="#sites">⌖ Sites</a>
+<a href="#routeurs">⌁ Routeurs</a>
+</nav>
+</aside>
+<main id="accueil">
+<header>
+<div><h1>Tableau de bord</h1><div class="sub">Centre de contrôle réseau · BAMBA</div></div>
+<div class="status">● Interface prête</div>
+</header>
+<section class="cards" id="statistiques">
+<div class="panel"><div class="label">Revenus enregistrés</div><div class="value">— FCFA</div><div class="note">À relier aux transactions réelles</div></div>
+<div class="panel"><div class="label">Paiements confirmés</div><div class="value">—</div><div class="note">À relier à la base des paiements</div></div>
+<div class="panel"><div class="label">Sites enregistrés</div><div class="value">—</div><div class="note">À relier à la base des sites</div></div>
+<div class="panel"><div class="label">Routeurs enregistrés</div><div class="value">—</div><div class="note">À relier à la base des routeurs</div></div>
+</section>
+<section class="columns">
+<div class="panel" id="revenus">
+<h2>▥ Évolution des revenus</h2>
+<div class="empty">Les graphiques seront alimentés après connexion aux données réelles de l'application.</div>
+<div class="bars" aria-label="Graphique en attente de données">
+<div class="bar" style="height:20%"><span>Lun.</span></div>
+<div class="bar" style="height:20%"><span>Mar.</span></div>
+<div class="bar" style="height:20%"><span>Mer.</span></div>
+<div class="bar" style="height:20%"><span>Jeu.</span></div>
+<div class="bar" style="height:20%"><span>Ven.</span></div>
+<div class="bar" style="height:20%"><span>Sam.</span></div>
+<div class="bar" style="height:20%"><span>Dim.</span></div>
+</div>
+<div class="chartfoot">Présentation visuelle uniquement : aucune valeur financière n'est simulée.</div>
+</div>
+<div class="panel" id="paiements">
+<h2>◉ État des paiements</h2>
+<div class="empty">Aucune statistique affichée tant que la source des paiements n'est pas reliée.</div>
+<div class="label">Confirmés</div><div class="track"><div class="fill" style="width:0%"></div></div>
+<div class="label">En attente</div><div class="track"><div class="fill" style="width:0%"></div></div>
+<div class="label">Échoués</div><div class="track"><div class="fill" style="width:0%"></div></div>
+</div>
+<div class="panel" id="sites">
+<h2>⌖ Statistiques par site</h2>
+<table><thead><tr><th>Site</th><th>Revenus</th><th>État</th></tr></thead><tbody><tr><td colspan="3" class="empty">En attente de connexion à la base des sites.</td></tr></tbody></table>
+</div>
+<div class="panel" id="routeurs">
+<h2>⌁ Statistiques par routeur</h2>
+<table><thead><tr><th>Routeur</th><th>Connexions</th><th>État</th></tr></thead><tbody><tr><td colspan="3" class="empty">En attente de connexion à la base des routeurs.</td></tr></tbody></table>
+</div>
+</section>
+</main>
+</div>
+</body>
+</html>

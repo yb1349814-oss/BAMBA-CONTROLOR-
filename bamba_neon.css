@@ -1,0 +1,93 @@
+/* BAMBA CONTROLOR — thème bleu néon */
+:root {
+  color-scheme: dark;
+  --bg: #020a20;
+  --panel: #06183b;
+  --line: #087dff;
+  --cyan: #00eaff;
+  --blue: #087cff;
+  --text: #eafaff;
+  --muted: #83c9ff;
+  --green: #00f5a0;
+}
+body {
+  background: radial-gradient(ellipse at 65% 0%, #062b70 0%, #020a20 48%, #010617 100%);
+  color: var(--text);
+}
+.sidebar {
+  background: linear-gradient(180deg, #031538, #01091e);
+  border-right: 1px solid #008cff;
+  box-shadow: 0 0 24px #006dff44;
+}
+.brand-mark {
+  border-color: var(--cyan);
+  box-shadow: 0 0 18px #00cfff99, inset 0 0 18px #008cff55;
+}
+.brand-mark svg {
+  filter: drop-shadow(0 0 7px #00eaff);
+}
+.brand-name {
+  color: var(--cyan);
+  text-shadow: 0 0 12px #00bfff, 0 0 24px #0077ff;
+}
+.brand-sub, .eyebrow {
+  color: #6ceeff;
+}
+.nav-item:hover, .nav-item.active {
+  background: linear-gradient(90deg, #006bff, #00a9e9);
+  border-color: #49eaff;
+  box-shadow: 0 0 16px #008cff88, inset 0 0 12px #00eaff33;
+  color: white;
+}
+.nav-icon {
+  color: var(--cyan);
+  text-shadow: 0 0 8px #00eaff;
+}
+.topbar {
+  background: #041431bb;
+  border-bottom-color: #007dff88;
+}
+.status {
+  border-color: #00cfff;
+  background: #052331;
+  box-shadow: 0 0 12px #00cfff33;
+}
+.content .panel, .content .card, .content article,
+.content section {
+  background: linear-gradient(145deg, #061b42ee, #03102c);
+  border: 1px solid #087dff;
+  border-radius: 13px;
+  box-shadow: inset 0 0 16px #006dff22, 0 0 14px #007dff22;
+}
+.content h2 {
+  color: #eafaff;
+  text-shadow: 0 0 8px #007cff55;
+}
+.content button, .content input[type=submit] {
+  background: linear-gradient(100deg, #006bff, #00a9e9);
+  border: 1px solid #00eaff;
+  box-shadow: 0 0 12px #008cff55;
+}
+.content input, .content select, .content textarea {
+  background: #020d25;
+  border-color: #087dff;
+  color: white;
+}
+.content th {
+  background: #06204a;
+  color: #6edbff;
+}
+.content td {
+  border-bottom-color: #124a82;
+}
+.content tr:hover td {
+  background: #0a2b58;
+}
+.content a {
+  color: #55dfff;
+}
+@media(max-width:760px) {
+  .sidebar {
+    background: linear-gradient(180deg, #031538, #01091e);
+  }
+}

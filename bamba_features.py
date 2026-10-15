@@ -93,7 +93,7 @@ def init_features():
 def admin_required(fn):
     @wraps(fn)
     def wrapped(*args, **kwargs):
-        if not session.get("connecte"):
+        if session.get("role") != "admin":
             return jsonify({"erreur":"Connexion administrateur requise"}), 401
         return fn(*args, **kwargs)
     return wrapped
