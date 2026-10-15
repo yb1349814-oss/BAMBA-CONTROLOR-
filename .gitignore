@@ -15,3 +15,13 @@ app.py.avant_hebergement
 *.sauvegarde_*
 *.sauvegarde-*
 *.bak
+
+# Bases de donnees locales : ne jamais publier
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+
+# Fichiers secrets
+.env
+auth_config.json
