@@ -211,6 +211,35 @@ def section(section):
         body='''<div class="panel"><h2>⇧ Importer les anciens codes Wi-Fi</h2><p style="color:#9fdcff">Importez un fichier CSV UTF-8 contenant une colonne <b>code</b> (ou Code, voucher, ticket). Les codes seront ajoutés à la liste Codes d’accès.</p><form method="post" enctype="multipart/form-data"><label>Fichier CSV</label><input type="file" name="fichier" accept=".csv,text/csv" required><button class="btn">Importer les codes</button></form><a href="/codes" class="btn">Consulter les codes importés</a></div>'''
         return page('Importation anciens codes',body,'/importer')
     table=section; fields=SCHEMA[table]; label=LABELS.get(table,table.title())
+
+    if section == 'codes' and request.method == 'POST' and request.form.get('action') == 'generate':
+        try:
+            quantite = int(request.form.get('quantite', '0'))
+        except (TypeError, ValueError):
+            quantite = 0
+        if not 1 <= quantite <= 500:
+            flash('Choisissez une quantité entre 1 et 500.')
+            return redirect('/codes')
+        source = (request.form.get('source') or 'Génération automatique').strip()[:80]
+        c = db()
+        generes = 0
+        for _ in range(quantite):
+            for tentative in range(30):
+                code = secrets.token_hex(5).upper()
+                existe = c.execute('SELECT 1 FROM codes WHERE code=?', (code,)).fetchone()
+                if not existe:
+                    c.execute(
+                        'INSERT INTO codes(created_at,code,source,statut) VALUES (?,?,?,?)',
+                        (datetime.now().isoformat(timespec='seconds'), code,
+                         source or 'Génération automatique', 'Disponible')
+                    )
+                    generes += 1
+                    break
+        c.commit()
+        c.close()
+        flash(f'{generes} code(s) Wi-Fi généré(s).')
+        return redirect('/codes')
+
     if request.method=='POST':
         c=db(); values=[request.form.get(f[0],'').strip() for f in fields]
         if request.form.get('action')=='delete':
@@ -223,10 +252,24 @@ def section(section):
     inputs=''.join(f'<div><label>{lab}</label><input name="{key}" placeholder="{lab}" {"required" if key in ("nom","code","reference","titre") else ""}></div>' for key,lab in fields)
     headers=''.join(f'<th>{lab}</th>' for _,lab in fields)
     rows_html=''
+
+    generator_html = ''
+    if table == 'codes':
+        generator_html = '''<div class="panel" style="margin-bottom:16px">
+        <h2>Générer des codes Wi-Fi</h2>
+        <form method="post">
+        <input type="hidden" name="action" value="generate">
+        <label>Nombre de codes (1 à 500)</label>
+        <input type="number" name="quantite" min="1" max="500" value="20" required>
+        <label>Nom du lot</label>
+        <input name="source" value="Génération automatique" maxlength="80">
+        <button class="btn">Générer les codes</button>
+        </form></div>'''
+
     for r in rows:
         cells=''.join(f'<td>{(r[k] or "—")}</td>' for k,_ in fields)
         rows_html+=f'<tr>{cells}<td><form method="post" onsubmit="return confirm(\'Supprimer cet élément ?\')"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{r["id"]}"><button class="btn danger" style="padding:6px 9px">Supprimer</button></form></td></tr>'
-    body=f'''<div class="panel" style="margin-bottom:16px"><h2>＋ Ajouter : {label}</h2><form method="post"><div class="formgrid">{inputs}</div><button class="btn">Enregistrer</button></form></div><div class="panel"><h2>{label} enregistrés ({len(rows)})</h2><div class="tablewrap"><table><thead><tr>{headers}<th>Action</th></tr></thead><tbody>{rows_html}</tbody></table></div>{'<div class="empty">Aucun élément pour le moment. Utilisez le formulaire ci-dessus pour commencer.</div>' if not rows else ''}</div>'''
+    body=f'''{generator_html}<div class="panel" style="margin-bottom:16px"><h2>＋ Ajouter : {label}</h2><form method="post"><div class="formgrid">{inputs}</div><button class="btn">Enregistrer</button></form></div><div class="panel"><h2>{label} enregistrés ({len(rows)})</h2><div class="tablewrap"><table><thead><tr>{headers}<th>Action</th></tr></thead><tbody>{rows_html}</tbody></table></div>{'<div class="empty">Aucun élément pour le moment. Utilisez le formulaire ci-dessus pour commencer.</div>' if not rows else ''}</div>'''
     return page(label,body,'/'+table)
 
 @app.errorhandler(500)
