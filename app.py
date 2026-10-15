@@ -153,23 +153,271 @@ def money_total():
 
 @app.route('/')
 def home():
-    c=db(); sales=c.execute('SELECT * FROM paiements ORDER BY id DESC LIMIT 5').fetchall(); users=c.execute('SELECT * FROM utilisateurs ORDER BY id DESC LIMIT 5').fetchall(); sites=c.execute('SELECT * FROM sites ORDER BY id DESC LIMIT 5').fetchall(); c.close()
-    total=money_total()
-    cards=[('Sites actifs',count('sites'),'sur les sites enregistrés'),('Routeurs',count('routeurs'),'routeurs configurés'),('Utilisateurs connectés',count('utilisateurs'),'utilisateurs enregistrés'),('Ventes du jour',f'{total:,.0f} FCFA'.replace(',',' '),'paiements confirmés')]
-    stats=''.join(f'<div class="stat"><div class="label">◉　{a}</div><div class="num">{b}</div><div class="sub">↗ {d}</div></div>' for a,b,d in cards)
-    chart='''<svg class="chart" viewBox="0 0 600 220" preserveAspectRatio="none"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00eaff" stop-opacity=".45"/><stop offset="1" stop-color="#007cff" stop-opacity="0"/></linearGradient></defs>'''
-    for y in range(30,201,34): chart+=f'<line x1="45" y1="{y}" x2="590" y2="{y}" stroke="#164c84" stroke-width="1"/><text x="4" y="{y+4}" fill="#9bcfff" font-size="11">{(200-y)*2500:,.0f}</text>'
-    points='50,175 120,158 190,139 260,145 330,112 400,95 470,100 540,65 585,48'
-    chart+=f'<polygon points="{points} 585,200 50,200" fill="url(#g)"/><polyline points="{points}" fill="none" stroke="#00eaff" stroke-width="3" stroke-linejoin="round"/>'
-    for x,label in zip([50,120,190,260,330,400,470,540,585],['06/10','07/10','08/10','09/10','10/10','11/10','12/10','13/10','14/10']): chart+=f'<text x="{x}" y="216" text-anchor="middle" fill="#a8dfff" font-size="10">{label}</text>'
-    chart+='</svg>'
-    sales_rows=''.join(f'<div class="rowitem"><span>{r["reference"] or "Paiement"}<br><small style="color:#76cfff">{r["client"] or "Client"}</small></span><b>{r["montant"] or "0"} FCFA</b><span class="pill">{r["statut"] or "En attente"}</span></div>' for r in sales) or '<div class="empty">Aucun paiement enregistré. Ajoutez un paiement pour commencer.</div>'
-    site_rows=''.join(f'<div class="statusline"><span>⌖　{r["nom"]}</span><span>{r["ville"] or "—"}</span><span class="pill">{r["statut"] or "À configurer"}</span></div>' for r in sites) or '<div class="empty">Aucun site enregistré.</div>'
-    user_rows=''.join(f'<div class="statusline"><span>♟　{r["nom"]}</span><span>{r["site"] or "—"}</span><span class="pill">{r["statut"] or "Actif"}</span></div>' for r in users) or '<div class="empty">Aucun utilisateur enregistré.</div>'
-    body=f'''<div class="grid">{stats}</div><div class="twocol"><div class="panel"><h2>▥　Évolution des ventes</h2>{chart}<div class="legend"><span><i class="dot"></i>Ventes / paiements</span><span>Montants selon les données enregistrées</span></div></div><div class="panel"><h2>◉　Statut du réseau</h2><div class="statusline"><span>Internet</span><span class="pill">À vérifier sur le routeur</span></div><div class="statusline"><span>Routeurs enregistrés</span><b>{count('routeurs')}</b></div><div class="statusline"><span>Sites enregistrés</span><b>{count('sites')}</b></div><div class="statusline"><span>Utilisateurs</span><b>{count('utilisateurs')}</b></div><h2 style="margin-top:18px">⚡　Raccourcis rapides</h2><div class="quick"><a href="/vouchers">＋ Vendre voucher</a><a href="/vendeurs">＋ Vendeur</a><a href="/routeurs">＋ Routeur</a><a href="/importer">⇧ Importer codes</a><a href="/statistiques">▥ Statistiques</a></div></div></div><div class="lower"><div class="panel"><h2>◉　Derniers paiements <a style="float:right;color:#00eaff" href="/paiements">Voir tout →</a></h2>{sales_rows}</div><div class="panel"><h2>♟　Utilisateurs actifs <a style="float:right;color:#00eaff" href="/utilisateurs">Voir tout →</a></h2>{user_rows}</div><div class="panel"><h2>⌖　Réseau & Sites <a style="float:right;color:#00eaff" href="/sites">Voir tout →</a></h2>{site_rows}</div><div class="panel"><h2>⚙　Fonctions disponibles</h2>{''.join(f'<div class="statusline"><a href="{href}">{label}</a><span class="pill">Ouvrir</span></div>' for label,href in [('Gestion des routeurs','/routeurs'),('Abonnements','/abonnements'),('Tickets Wi-Fi','/tickets'),('Codes d’accès','/codes'),('MikroTik','/mikrotik'),('Roaming inter-sites','/roaming')])}</div></div>'''
-    _bamba_neon_style = '<style>\n.grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important;margin:16px 0 20px!important}\n.stat,.panel{background:linear-gradient(145deg,#0b2340,#07162b)!important;border:1px solid #164b75!important;border-radius:15px!important;color:#e9f7ff!important;box-shadow:0 0 18px #00cfff12!important}\n.stat{padding:18px!important;overflow:hidden}\n.stat .label{color:#9ac9eb!important;font-size:12px!important}\n.stat .num{color:#fff!important;font-size:clamp(20px,2.5vw,29px)!important;font-weight:800!important;text-shadow:0 0 12px #00cfff35!important;overflow-wrap:anywhere}\n.stat .sub{color:#63c9f7!important;font-size:11px!important}\n.panel{padding:18px!important;margin-bottom:16px!important;min-width:0}\n.panel h2{color:#e5f8ff!important;font-size:16px!important;border-bottom:1px solid #153c5d;padding-bottom:10px}\n.twocol{display:grid!important;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)!important;gap:16px!important;margin-bottom:16px!important}\n.lower{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important}\n.chart{max-width:100%;height:auto;min-height:170px}\n.quick{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}\n.quick a{display:block;padding:11px!important;border:1px solid #17486d!important;border-radius:10px!important;background:#081b31!important;color:#00eaff!important;text-decoration:none!important;font-size:12px}\n.panel a{color:#00eaff!important}\n.rowitem,.statusline{border-bottom:1px solid #14324f!important;padding:11px 0!important;color:#dff4ff!important;gap:10px}\n.pill{display:inline-block!important;border:1px solid #176185!important;border-radius:20px!important;padding:5px 8px!important;color:#8deaff!important;background:#06243b!important;font-size:10px!important}\n.empty{color:#80afd0!important;padding:15px 0!important}\n.bamba-neon-hero{display:flex;align-items:center;gap:14px;padding:20px;margin:0 0 18px;border:1px solid #087eaf;border-radius:18px;background:radial-gradient(ellipse at top right,#073e6b 0%,#071a32 52%,#061225 100%);box-shadow:0 0 25px #00bfff18;color:#fff}\n.bamba-neon-logo{width:58px;height:58px;flex-shrink:0;display:grid;place-items:center;border:1px solid #00eaff;border-radius:16px;background:#062747;box-shadow:0 0 18px #00cfff40}\n.bamba-neon-logo svg{width:43px;height:43px}\n.bamba-neon-title{font-size:24px;font-weight:900;letter-spacing:2px;text-shadow:0 0 14px #00cfff}\n.bamba-neon-title span{color:#00eaff}\n.bamba-neon-caption{margin-top:5px;color:#92c9ed;font-size:11px;letter-spacing:1px}\n@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.twocol,.lower{grid-template-columns:1fr!important}}\n@media(max-width:520px){.stat,.panel{padding:12px!important}.quick{grid-template-columns:1fr!important}.bamba-neon-title{font-size:18px;letter-spacing:1px}.bamba-neon-hero{padding:14px}.bamba-neon-logo{width:48px;height:48px}}\n</style>\n<div class="bamba-neon-hero"><div class="bamba-neon-logo"><svg viewBox="0 0 48 48" fill="none" aria-label="Wi-Fi BAMBA"><path d="M5 17C16 7 32 7 43 17M11 24C19 17 29 17 37 24M18 31C22 28 26 28 30 31" stroke="#00eaff" stroke-width="3.5" stroke-linecap="round"/><circle cx="24" cy="38" r="3" fill="#00eaff"/></svg></div><div><div class="bamba-neon-title">BAMBA <span>CONTROLOR</span></div><div class="bamba-neon-caption">TABLEAU DE BORD · GESTION DU RÉSEAU WI-FI</div></div></div>\n'
-    body = _bamba_neon_style + body
-    return page('Tableau de bord',body,'/')
+    c = db()
+
+    def total(table):
+        return c.execute(
+            f'SELECT COUNT(*) FROM "{table}"'
+        ).fetchone()[0]
+
+    def recentes(table, limit=5):
+        return c.execute(
+            f'SELECT * FROM "{table}" ORDER BY id DESC LIMIT ?',
+            (limit,)
+        ).fetchall()
+
+    def argent():
+        rows = c.execute("""
+            SELECT montant FROM paiements
+            WHERE LOWER(COALESCE(statut,'')) IN
+            ('payé','paye','confirmé','confirme','reçu','recu')
+        """).fetchall()
+        return sum(float(r[0] or 0) for r in rows)
+
+    def fmt(value):
+        return f"{value:,.0f}".replace(",", " ")
+
+    def table_html(rows, keys):
+        if not rows:
+            return '<tr><td colspan="10">Aucune donnée enregistrée</td></tr>'
+        out = ''
+        for row in rows:
+            out += '<tr>'
+            for key in keys:
+                value = row[key] if key in row.keys() else '—'
+                out += '<td>' + str(value or '—') + '</td>'
+            out += '</tr>'
+        return out
+
+    clients = total('utilisateurs')
+    tickets = total('tickets')
+    nb_routeurs = total('routeurs')
+    nb_sites = total('sites')
+    nb_abonnements = c.execute("""
+        SELECT COUNT(*) FROM abonnements
+        WHERE LOWER(COALESCE(statut,'')) IN
+        ('actif','active','actifs','actives')
+    """).fetchone()[0]
+    formules = c.execute("""
+        SELECT COUNT(DISTINCT formule) FROM abonnements
+        WHERE COALESCE(formule,'') <> ''
+    """).fetchone()[0]
+
+    revenus = argent()
+    paiements = recentes('paiements')
+    abonnements = recentes('abonnements')
+    tickets_recents = recentes('tickets')
+    derniers_sites = recentes('sites')
+    derniers_routeurs = recentes('routeurs')
+
+    # Construire un graphique à partir des paiements réels.
+    historique = c.execute("""
+        SELECT substr(created_at,1,10) AS jour,
+               SUM(CAST(montant AS REAL)) AS total
+        FROM paiements
+        WHERE LOWER(COALESCE(statut,'')) IN
+        ('payé','paye','confirmé','confirme','reçu','recu')
+        GROUP BY substr(created_at,1,10)
+        ORDER BY jour DESC LIMIT 7
+    """).fetchall()
+    historique = list(reversed(historique))
+    c.close()
+
+    points = []
+    valeurs = [float(r['total'] or 0) for r in historique]
+    maximum = max(valeurs, default=0) or 1
+    for i, value in enumerate(valeurs):
+        x = 40 + i * (520 / max(len(valeurs)-1, 1))
+        y = 170 - (value / maximum) * 125
+        points.append((x, y))
+
+    coordonnees = ' '.join(f'{x:.1f},{y:.1f}' for x,y in points)
+    lignes_grille = ''.join(
+        f'<line x1="35" y1="{y}" x2="575" y2="{y}" '
+        f'stroke="#16416c"/>' for y in (45,80,115,150,180)
+    )
+    points_svg = ''.join(
+        f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="#00eaff"/>'
+        for x,y in points
+    )
+    etiquettes = ''.join(
+        f'<text x="{40+i*(520/max(len(historique)-1,1)):.1f}" y="205" '
+        f'text-anchor="middle" fill="#9bcfff" font-size="10">'
+        f'{str(r["jour"] or "")[5:]}</text>'
+        for i,r in enumerate(historique)
+    )
+    graphique = f"""
+    <svg class="chart" viewBox="0 0 600 220" role="img"
+         aria-label="Historique des paiements confirmés">
+      {lignes_grille}
+      <polyline points="{coordonnees}" fill="none"
+        stroke="#00eaff" stroke-width="3"/>
+      {points_svg}{etiquettes}
+    </svg>
+    """
+
+    css = """
+    <style>
+    .bc-hero{padding:22px;border:1px solid #087dff;border-radius:16px;
+      margin-bottom:16px;background:linear-gradient(105deg,#04102c,#073e85,#04132c);
+      box-shadow:0 0 25px #007dff30}
+    .bc-logo{font-size:clamp(24px,3vw,38px);font-weight:900;
+      color:#00eaff;text-shadow:0 0 16px #008cff}
+    .bc-hero p{color:#c1eaff;margin-bottom:0}
+    .bc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;margin-bottom:16px}
+    .bc-card{padding:16px;min-width:0;border:1px solid #087dff;
+      border-radius:13px;background:linear-gradient(145deg,#0a2851,#04132c);
+      box-shadow:inset 0 0 20px #007dff12}
+    .bc-label{color:#a8dfff;font-size:12px}
+    .bc-num{font-size:clamp(20px,2.3vw,30px);font-weight:800;
+      color:white;margin:12px 0;overflow-wrap:anywhere}
+    .bc-green{color:#00f5b0;font-size:11px}
+    .bc-two{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;
+      margin-bottom:14px}
+    .bc-lower{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px}
+    .bc-card h2{font-size:15px;color:#e9faff}
+    .bc-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:9px}
+    .bc-shortcuts a{display:block;padding:12px 8px;text-align:center;
+      border:1px solid #087dff;border-radius:9px;
+      background:linear-gradient(100deg,#0757c8,#008cce);
+      color:white;text-decoration:none;font-size:12px}
+    .bc-line{display:flex;justify-content:space-between;gap:10px;
+      padding:12px 0;border-bottom:1px solid #16416c;font-size:12px}
+    .bc-chart{width:100%;height:auto;min-height:170px}
+    .bc-table{overflow-x:auto}
+    .bc-table table{min-width:430px}
+    .bc-foot{color:#8bcfff;font-size:11px;margin-top:14px}
+    @media(max-width:1000px){
+      .bc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .bc-two,.bc-lower{grid-template-columns:1fr}
+    }
+    @media(max-width:520px){
+      .bc-card{padding:11px}
+      .bc-shortcuts{grid-template-columns:1fr}
+    }
+    </style>
+    """
+
+    hero = """
+    <div class="bc-hero">
+      <div class="bc-logo">◉ BAMBA CONTROLOR</div>
+      <p>Plus qu'un Wi-Fi, une solution !</p>
+      <p>Gérez, contrôlez et développez votre réseau Wi-Fi.</p>
+    </div>
+    """
+
+    cards = f"""
+    <div class="bc-grid">
+      <div class="bc-card"><div class="bc-label">♟ Clients enregistrés</div>
+        <div class="bc-num">{fmt(clients)}</div><div class="bc-green">Base utilisateurs</div></div>
+      <div class="bc-card"><div class="bc-label">▤ Tickets créés</div>
+        <div class="bc-num">{fmt(tickets)}</div><div class="bc-green">Tickets enregistrés</div></div>
+      <div class="bc-card"><div class="bc-label">◷ Abonnements actifs</div>
+        <div class="bc-num">{fmt(nb_abonnements)}</div><div class="bc-green">Statuts actifs en base</div></div>
+      <div class="bc-card"><div class="bc-label">▣ Formules disponibles</div>
+        <div class="bc-num">{fmt(formules)}</div><div class="bc-green">Formules enregistrées</div></div>
+    </div>
+    """
+
+    routeur = derniers_routeurs[0] if derniers_routeurs else None
+    routeur_nom = routeur['nom'] if routeur else 'Aucun routeur'
+    routeur_ip = routeur['ip'] if routeur else 'Non configurée'
+    routeur_statut = routeur['statut'] if routeur else 'À configurer'
+
+    chart_panel = f"""
+    <div class="panel">
+      <h2>▥ Évolution des ventes et paiements</h2>
+      {graphique}
+      <div class="bc-foot">Paiements confirmés, regroupés par date.</div>
+    </div>
+    """
+
+    network_panel = f"""
+    <div class="panel">
+      <h2>⌁ État du routeur MikroTik</h2>
+      <div class="bc-line"><span>Routeur</span><b>{routeur_nom}</b></div>
+      <div class="bc-line"><span>Adresse IP</span><b>{routeur_ip or '—'}</b></div>
+      <div class="bc-line"><span>Statut enregistré</span><b>{routeur_statut or '—'}</b></div>
+      <div class="bc-line"><span>Routeurs enregistrés</span><b>{nb_routeurs}</b></div>
+      <div class="bc-line"><span>Sites enregistrés</span><b>{nb_sites}</b></div>
+      <div class="bc-line"><span>Utilisateurs enregistrés</span><b>{clients}</b></div>
+      <p class="bc-foot">L'état réel du routeur nécessite une connexion MikroTik configurée.</p>
+      <a class="btn" href="/mikrotik">Gérer le routeur →</a>
+    </div>
+    """
+
+    shortcuts = """
+    <div class="panel" style="margin-bottom:14px">
+      <h2>⚡ Actions rapides</h2>
+      <div class="bc-shortcuts">
+        <a href="/codes">Créer des codes Wi-Fi</a>
+        <a href="/tickets">Créer un ticket Wi-Fi</a>
+        <a href="/abonnements">Nouvel abonnement</a>
+        <a href="/revendeurs">Ajouter un revendeur</a>
+        <a href="/paiements">Consulter les paiements</a>
+        <a href="/importer">Importer un fichier CSV</a>
+        <a href="/statistiques">Ouvrir les statistiques</a>
+        <a href="/routeurs">Gérer les routeurs</a>
+      </div>
+    </div>
+    """
+
+    payments_panel = f"""
+    <div class="panel">
+      <h2>Derniers paiements <a style="float:right" href="/paiements">Voir tout →</a></h2>
+      <div class="bc-table"><table><thead><tr>
+        <th>Référence</th><th>Client</th><th>Montant</th><th>Statut</th>
+      </tr></thead><tbody>
+      {table_html(paiements,['reference','client','montant','statut'])}
+      </tbody></table></div>
+    </div>
+    """
+
+    subscriptions_panel = f"""
+    <div class="panel">
+      <h2>Abonnements récents <a style="float:right" href="/abonnements">Voir tout →</a></h2>
+      <div class="bc-table"><table><thead><tr>
+        <th>Client</th><th>Formule</th><th>Statut</th><th>Fin</th>
+      </tr></thead><tbody>
+      {table_html(abonnements,['client','formule','statut','fin'])}
+      </tbody></table></div>
+    </div>
+    """
+
+    tickets_panel = f"""
+    <div class="panel">
+      <h2>Derniers tickets <a style="float:right" href="/tickets">Voir tout →</a></h2>
+      <div class="bc-table"><table><thead><tr>
+        <th>Code</th><th>Formule</th><th>Prix</th><th>Statut</th>
+      </tr></thead><tbody>
+      {table_html(tickets_recents,['code','type','prix','statut'])}
+      </tbody></table></div>
+    </div>
+    """
+
+    sites_panel = f"""
+    <div class="panel">
+      <h2>Sites récents <a style="float:right" href="/sites">Voir tout →</a></h2>
+      <div class="bc-table"><table><thead><tr>
+        <th>Nom</th><th>Ville</th><th>Statut</th>
+      </tr></thead><tbody>
+      {table_html(derniers_sites,['nom','ville','statut'])}
+      </tbody></table></div>
+    </div>
+    """
+
+    body = (
+        css + '<div class="bc-dashboard">' + hero + cards
+        + '<div class="bc-two">' + chart_panel + network_panel + '</div>'
+        + shortcuts + '<div class="bc-lower">' + payments_panel
+        + subscriptions_panel + tickets_panel + sites_panel
+        + '</div></div>'
+    )
+
+    return page('Tableau de bord', body, '/', True)
 
 @app.route('/<section>', methods=['GET','POST'])
 def section(section):
