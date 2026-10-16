@@ -295,15 +295,6 @@ def install_auth(app, app_globals):
                 or not account["active"]
             ):
                 flash("Identifiants incorrects ou compte indisponible.")
-            elif not account["verified"]:
-                flash("Votre e-mail n'est pas encore vérifié.")
-                try:
-                    issue_email(app, account, "verify")
-                    flash("Un nouveau lien de vérification a été envoyé.")
-                except Exception:
-                    flash(
-                        "Envoi impossible. Vérifiez la configuration SMTP."
-                    )
             else:
                 session.clear()
                 session["bamba_account_id"] = account["id"]
@@ -355,7 +346,7 @@ def install_auth(app, app_globals):
                             INSERT INTO accounts(
                                 email,phone,password_hash,company,
                                 owner_name,verified,created_at
-                            ) VALUES(?,?,?,?,?,0,?)
+                            ) VALUES(?,?,?,?,?,1,?)
                         """, (
                             email, phone or None,
                             generate_password_hash(password),
@@ -367,20 +358,13 @@ def install_auth(app, app_globals):
                             (account_id,)
                         ).fetchone()
 
-                    issue_email(app, account, "verify")
-                    flash(
-                        "Compte créé. Consultez votre e-mail pour confirmer "
-                        "votre adresse avant de vous connecter."
-                    )
+                    flash("Compte société créé. Vous pouvez vous connecter.")
                     return redirect(url_for("bamba_login"))
                 except sqlite3.IntegrityError:
                     flash("Cet e-mail ou ce téléphone est déjà enregistré.")
                 except Exception:
-                    # Le compte reste non vérifié si l'e-mail ne part pas.
-                    flash(
-                        "Inscription enregistrée mais e-mail non envoyé. "
-                        "Configurez SMTP puis réessayez la vérification."
-                    )
+                    app.logger.exception("Échec de création du compte société")
+                    flash("Impossible de créer le compte. Vérifiez les informations.")
 
         body = """
         <form method="post">
@@ -388,7 +372,7 @@ def install_auth(app, app_globals):
         <input name="name" maxlength="120" required>
         <label>Nom de la société</label>
         <input name="company" maxlength="160" required>
-        <label>Adresse e-mail de vérification</label>
+        <label>Adresse e-mail</label>
         <input type="email" name="email" autocomplete="email" required>
         <label>Téléphone (facultatif)</label>
         <input name="phone" autocomplete="tel">
