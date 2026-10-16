@@ -210,9 +210,31 @@ def install_auth(app, app_globals):
     # Leur accès aux données métier devient lié au compte connecté.
     app_globals["db"] = private_db
 
+    initialized_tenants = set()
+
     def ensure_tenant_schema():
-        # Réutilise le schéma existant sans mélanger les bases des comptes.
-        original_init_db()
+        account_id = session.get("bamba_account_id")
+        if not account_id:
+            raise RuntimeError("Compte requis pour initialiser la base.")
+
+        tenant_path = tenant_database_path(account_id, base_db)
+        tenant_key = str(account_id)
+
+        if tenant_key in initialized_tenants and Path(tenant_path).exists():
+            return
+
+        previous_db_path = app_globals["DB"]
+        previous_db_function = app_globals["db"]
+
+        try:
+            # Initialise le schéma dans la base de CE compte.
+            app_globals["DB"] = tenant_path
+            app_globals["db"] = original_db
+            original_init_db()
+            initialized_tenants.add(tenant_key)
+        finally:
+            app_globals["DB"] = previous_db_path
+            app_globals["db"] = previous_db_function
 
     public_endpoints = {
         "bamba_login", "bamba_register", "bamba_verify",
