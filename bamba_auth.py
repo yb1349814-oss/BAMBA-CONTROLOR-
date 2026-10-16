@@ -433,6 +433,35 @@ def install_auth(app, app_globals):
         flash("Compte vérifié. Vous pouvez maintenant vous connecter.")
         return redirect(url_for("bamba_login"))
 
+    @app.route("/renvoyer-verification", methods=["GET", "POST"])
+    def bamba_resend_verification():
+        if request.method == "POST":
+            email = request.form.get("email", "").strip().lower()
+            with auth_connection() as c:
+                account = c.execute(
+                    "SELECT * FROM accounts WHERE email=? AND active=1",
+                    (email,)
+                ).fetchone()
+
+            if account and not account["verified"]:
+                try:
+                    issue_email(app, account, "verify")
+                except Exception:
+                    app.logger.exception("Échec d'envoi du lien de vérification")
+
+            flash("Si un compte actif non vérifié correspond à cette adresse, un lien de vérification sera envoyé.")
+            return redirect(url_for("bamba_resend_verification"))
+
+        return auth_page("Renvoyer le lien de vérification", """
+        <p>Indiquez l'adresse e-mail associée à votre compte.</p>
+        <form method="post">
+        <label>Adresse e-mail</label>
+        <input type="email" name="email" required>
+        <button type="submit">Renvoyer le lien</button>
+        </form>
+        <p><a href="/connexion">Retour à la connexion</a></p>
+        """)
+
     @app.route("/mot-de-passe-oublie", methods=["GET", "POST"])
     def bamba_forgot():
         if request.method == "POST":
